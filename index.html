@@ -1,0 +1,618 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex">
+<title>La Unión Mayorista</title>
+<style>[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap">
+<style id="css">
+/* Concepto: lista de precios de mayorista. Filas densas con precio grande, fondo neutro verdoso, amarillo de etiqueta en el logo y verde profundo para acciones. */
+:root{
+  --bg:#F3F6F2; --surface:#FFFFFF; --ink:#13201B; --muted:#56665E; --line:#D9E1DB;
+  --brand:#0A5C46; --brand-ink:#FFFFFF; --tag:#FFD21F; --tag-ink:#1A1600;
+  --focus:#0A5C46; --scrim:rgba(8,16,12,.5);
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1512; --surface:#16201B; --ink:#EAF1ED; --muted:#9DB0A6; --line:#27352E;
+    --brand:#34C79B; --brand-ink:#04130D; --tag:#FFD21F; --tag-ink:#1A1600;
+    --focus:#34C79B; --scrim:rgba(0,0,0,.65); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1512; --surface:#16201B; --ink:#EAF1ED; --muted:#9DB0A6; --line:#27352E;
+  --brand:#34C79B; --brand-ink:#04130D; --tag:#FFD21F; --tag-ink:#1A1600;
+  --focus:#34C79B; --scrim:rgba(0,0,0,.65); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.4 var(--body);margin:0}
+button,input,textarea,select{font-family:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:0 120px}
+body.adm .wrap{padding-bottom:230px}
+
+.brand{display:flex;align-items:center;gap:12px;padding-block:18px 8px;flex-wrap:wrap}
+.logo{background:var(--tag);color:var(--tag-ink);font:800 34px/1 var(--display);letter-spacing:.02em;text-transform:uppercase;padding:8px 12px 6px;border-radius:4px}
+.brand p{margin:0;color:var(--muted);font-size:15px}
+.brand p b{color:var(--ink);font-weight:600}
+.brandbtns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px 8px;display:grid;gap:10px}
+.search{width:100%;min-height:46px;padding:0 14px;border:2px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-size:16px}
+.search:focus{border-color:var(--brand)}
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chip{flex:none;min-height:40px;padding:0 14px;border:2px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font:600 15px var(--body);cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+
+section.cat{margin-top:22px;scroll-margin-top:130px}
+section.cat h2{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 10px;font:700 26px/1 var(--display);text-transform:uppercase;letter-spacing:.03em;text-wrap:balance}
+section.cat h2 small{font:500 14px var(--body);color:var(--muted);text-transform:none;letter-spacing:0;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:8px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:8px;display:grid;grid-template-columns:minmax(0,1fr) 128px;align-items:center;gap:6px 12px;padding:10px 10px 10px 12px;min-width:0}
+.row h3{margin:0;font:600 16px/1.25 var(--body);overflow-wrap:anywhere}
+.price{margin:2px 0 0;font:700 24px/1 var(--display);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.row.out h3,.row.out .price{color:var(--muted)}
+.pill{justify-self:end;padding:6px 10px;border-radius:999px;background:var(--line);color:var(--muted);font:700 13px/1 var(--body);letter-spacing:.06em;text-transform:uppercase}
+.add{width:100%;min-height:44px;border:0;border-radius:6px;background:var(--brand);color:var(--brand-ink);font:600 16px var(--body);cursor:pointer}
+.step{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;min-height:44px;border:2px solid var(--brand);border-radius:6px;overflow:hidden;background:var(--surface)}
+.step button{border:0;background:var(--brand);color:var(--brand-ink);font:600 22px/1 var(--body);cursor:pointer}
+.step input{width:100%;min-width:0;border:0;text-align:center;font:600 17px var(--body);background:var(--surface);color:var(--ink);-moz-appearance:textfield;appearance:textfield}
+.step input::-webkit-inner-spin-button,.step input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.empty{margin-top:28px;padding:20px;border:1px dashed var(--muted);border-radius:8px;color:var(--muted);text-align:center}
+
+.row.adm.chg{border:2px solid var(--brand)}
+.pin{display:flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:6px;padding:0 8px;min-height:44px;background:var(--bg)}
+.pin input{width:100%;min-width:0;border:0;background:transparent;color:var(--ink);text-align:right;font:700 20px var(--display);font-variant-numeric:tabular-nums}
+.chk{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:14px;color:var(--muted)}
+.chk input{width:20px;height:20px}
+.addcard{margin-top:10px;padding:12px;border:2px dashed var(--brand);border-radius:8px;display:grid;gap:10px;background:var(--surface)}
+.addcard h2{margin:0;font:700 22px/1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.admbar{position:fixed;left:0;right:0;bottom:0;z-index:12;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:2px solid var(--brand);display:grid;gap:8px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts>*{flex:1 1 140px}
+
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.cartbtn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;max-width:560px;margin:0 auto;min-height:56px;padding:0 18px;border:0;border-radius:10px;background:var(--brand);color:var(--brand-ink);font:600 17px var(--body);cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.22)}
+.cartbtn .tot{font:700 24px/1 var(--display);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+
+.sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.panel{position:relative;width:100%;max-width:560px;max-height:92%;overflow-y:auto;background:var(--surface);border-radius:14px 14px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.phead h2{margin:0;font:700 28px/1 var(--display);text-transform:uppercase;letter-spacing:.03em}
+.x{min-height:40px;padding:0 14px;border:2px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:600 15px var(--body);cursor:pointer}
+.line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding-block:10px;border-bottom:1px solid var(--line)}
+.lname{min-width:0}
+.lname b{display:block;font-weight:600;overflow-wrap:anywhere}
+.lname span{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.ltotal{font:700 20px/1.2 var(--display);letter-spacing:.02em;font-variant-numeric:tabular-nums;text-align:right}
+.line .step{max-width:150px}
+.totals{margin:0;display:grid;gap:6px;font-variant-numeric:tabular-nums}
+.totals div{display:flex;justify-content:space-between;gap:12px}
+.totals dt{color:var(--muted)}
+.totals dd{margin:0;font-weight:600}
+.totals .grand{padding-top:8px;border-top:2px solid var(--ink);align-items:baseline}
+.totals .grand dt{color:var(--ink);font:700 20px var(--display);text-transform:uppercase;letter-spacing:.04em}
+.totals .grand dd{font:800 32px/1 var(--display);letter-spacing:.02em}
+.form{display:grid;gap:12px}
+.fld{display:grid;gap:6px}
+.form label,.lbl{font-weight:600;font-size:14px}
+.form input,.form textarea,.form select,#preview{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font-size:16px}
+.form input:focus,.form textarea:focus,.form select:focus{border-color:var(--brand)}
+#preview{font-size:14px;line-height:1.4;resize:vertical}
+.err{margin:0;background:var(--tag);color:var(--tag-ink);padding:8px 10px;border-radius:6px;font-weight:600;font-size:14px}
+.send{display:flex;align-items:center;justify-content:center;width:100%;min-height:52px;border:0;border-radius:8px;background:var(--brand);color:var(--brand-ink);font:600 17px var(--body);text-decoration:none;text-align:center;padding:0 12px;cursor:pointer}
+.ghost{min-height:46px;border:2px solid var(--brand);border-radius:8px;background:transparent;color:var(--brand);font:600 16px var(--body);cursor:pointer}
+.status{margin:0;min-height:1.2em;font-size:14px;color:var(--brand);font-weight:600}
+.small{margin:0;color:var(--muted);font-size:14px}
+
+.reg{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;padding-inline:16px;display:flex;justify-content:center;align-items:flex-start}
+.regbox{width:100%;max-width:460px;display:grid;gap:14px;padding-block:24px 48px}
+.regbox .logo{justify-self:start}
+.regbox h1{margin:0;font:700 34px/1.05 var(--display);text-transform:uppercase;letter-spacing:.03em;text-wrap:balance}
+.welcome{margin-top:8px;padding:12px;border:2px solid var(--brand);border-radius:8px;background:var(--surface);display:grid;gap:8px}
+.welcome p{margin:0}
+.welcome .send{flex:1 1 220px;width:auto}
+@media (min-width:700px){.wrap{padding-inline:24px}.sheet{align-items:center}.panel{border-radius:14px;max-height:88%}}
+</style></head><body>
+<script type="text/html" id="markup">
+<div class="wrap">
+  <header class="brand">
+    <div class="logo">La Unión</div>
+    <p><b>Mayorista · Ezeiza</b><br><span id="fechatxt"></span></p>
+    <div class="brandbtns">
+      <button type="button" class="x" id="editme" hidden>Mis datos</button>
+      <button type="button" class="x" id="adminbtn" hidden>Administrar</button>
+    </div>
+  </header>
+
+  <div class="welcome" id="welcome" hidden>
+    <p><b>¡Listo, <span id="w-name"></span>!</b> Tus datos quedaron guardados en este celular.</p>
+    <p class="small">Avisale a La Unión que sos cliente nuevo para que te tengan en su lista.</p>
+    <div class="acts">
+      <a id="w-wa" class="send" href="https://wa.me/" target="_blank" rel="noopener">Avisar por WhatsApp</a>
+      <button type="button" class="x" id="w-close">Ahora no</button>
+    </div>
+  </div>
+
+  <div class="addcard form" id="addcard" hidden>
+    <h2>Agregar producto</h2>
+    <div class="fld"><label for="a-nombre">Nombre y presentación</label><input id="a-nombre" placeholder="Ej. Coca Cola 3lt x6 un"></div>
+    <div class="fld"><label for="a-cat">Rubro</label><select id="a-cat"></select></div>
+    <div class="fld"><label for="a-precio">Precio</label><input id="a-precio" type="number" inputmode="numeric" min="0" step="1"></div>
+    <p class="err" id="a-err" hidden></p>
+    <button type="button" class="ghost" id="a-add">Agregar a la lista</button>
+  </div>
+
+  <div class="bar">
+    <input id="buscar" class="search" type="search" placeholder="Buscar producto (ej. coca, arroz, fernet)" autocomplete="off" aria-label="Buscar producto">
+    <nav class="cats" id="cats" aria-label="Rubros"></nav>
+  </div>
+
+  <main id="list"></main>
+</div>
+
+<div class="cartbar" id="cartbar" hidden>
+  <button type="button" class="cartbtn" id="opencart">
+    <span id="cartlabel">Ver pedido</span>
+    <span class="tot" id="carttotal"></span>
+  </button>
+</div>
+
+<div class="admbar" id="admbar" hidden>
+  <p class="status" id="admmsg" role="status"></p>
+  <div class="acts">
+    <button type="button" class="send" id="admpub">Publicar cambios</button>
+    <button type="button" class="ghost" id="admdisc">Descartar</button>
+    <button type="button" class="ghost" id="admlink">Copiar link</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-t">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <div class="phead">
+      <h2 id="sheet-t">Tu pedido</h2>
+      <button type="button" class="x" id="closecart" data-close>Cerrar</button>
+    </div>
+    <div id="lines"></div>
+    <dl class="totals" id="totals"></dl>
+    <p class="small" id="who"></p>
+    <div class="form">
+      <div class="fld"><label for="notas">Notas (opcional)</label><textarea id="notas" rows="2"></textarea></div>
+    </div>
+    <a id="wa" class="send" href="https://wa.me/" target="_blank" rel="noopener">Abrir WhatsApp con el pedido</a>
+    <button type="button" class="ghost" id="copy">Copiar pedido</button>
+    <p class="status" id="status" role="status"></p>
+    <p class="small">Se abre WhatsApp con el mensaje listo. El pedido se envía cuando tocás Enviar dentro de WhatsApp.</p>
+    <label class="lbl" for="preview">Vista del mensaje</label>
+    <textarea id="preview" readonly rows="8"></textarea>
+  </div>
+</div>
+
+<div class="reg" id="reg" hidden role="dialog" aria-modal="true" aria-labelledby="reg-t">
+  <div class="regbox">
+    <div class="logo">La Unión</div>
+    <h1 id="reg-t">Registrá tu comercio</h1>
+    <p class="small">Lo hacés una sola vez. Tus datos quedan guardados en este celular y se mandan con cada pedido.</p>
+    <form id="regform" class="form" novalidate>
+      <div class="fld"><label for="r-duenos">Nombre del dueño o los dueños</label><input id="r-duenos" autocomplete="name"></div>
+      <div class="fld"><label for="r-comercio">Nombre del comercio</label><input id="r-comercio" autocomplete="organization"></div>
+      <div class="fld"><label for="r-tel">Teléfono (con característica)</label><input id="r-tel" type="tel" inputmode="tel" autocomplete="tel"></div>
+      <div class="fld"><label for="r-dir">Dirección</label><input id="r-dir" autocomplete="street-address"></div>
+      <div class="fld"><label for="r-loc">Localidad</label><input id="r-loc" autocomplete="address-level2"></div>
+      <p class="err" id="r-err" hidden></p>
+      <button type="submit" class="send" id="regsubmit">Entrar al catálogo</button>
+      <button type="button" class="ghost" id="regcancel" hidden>Cancelar</button>
+    </form>
+  </div>
+</div>
+</script>
+<div id="root"></div>
+<script id="data" type="application/json">{"fecha":"2026-10-13","p":[["cajon-brahma-x1l","cerveza","Cajón Brahma x1l",37000],["cajon-budweiser-x1l","cerveza","Cajón Budweiser x1l",38600],["cajon-heineken-x1l","cerveza","Cajón Heineken x1l",55000],["cajon-imperial-golden-x1l","cerveza","Cajón Imperial Golden x1l",39500],["cajon-miller-x1l","cerveza","Cajón Miller x1l",41500],["cajon-palermo-x1l","cerveza","Cajón Palermo x1l",29000],["cajon-quilmes-x1l","cerveza","Cajón Quilmes x1l",37500],["cerveza-361-x1lt-x6-un","cerveza","Cerveza 361 x1lt x6 un",10620],["corona-710ml-x12-un","cerveza","Corona 710ml x12 un",60000],["corona-710ml-x-unidad","cerveza","Corona 710ml x unidad",5000],["lata-1890-x6-un","cerveza","Lata 1890 x6 un",7650],["lata-brahma-473ml-x6-un","cerveza","Lata Brahma 473ml x6 un",11000],["lata-budwieser-x6-un","cerveza","Lata Budwieser x6 un",11500],["lata-heineken-x6-un","cerveza","Lata Heineken x6 un",18800],["lata-imperial-golden-x6-un","cerveza","Lata Imperial Golden x6 un",12350],["lata-jugador-n12-x6-un","cerveza","Lata Jugador N°12 x6 un",23000],["lata-miller-x6-un","cerveza","Lata Miller x6 un",12000],["lata-schneider-473-x6-un","cerveza","Lata Schneider 473 x6 un",11500],["laton-brahma-x4-un","cerveza","Latón Brahma x4 un",10800],["laton-budweiser-x4-un","cerveza","Latón Budweiser x4 un",10350],["laton-heineken-x6-un","cerveza","Latón Heineken x6 un",27400],["laton-imperial-golden-x6-un","cerveza","Latón Imperial Golden x6 un",18750],["laton-miller-x6-un","cerveza","Latón Miller x6 un",22100],["laton-schneider-x6-un","cerveza","Latón Schneider x6 un",16000],["maradona-cerveza-1lt-x6-un","cerveza","Maradona Cerveza 1lt x6 un",15000],["maradona-cerveza-1lt-x-unidad","cerveza","Maradona Cerveza 1lt x unidad",2500],["porron-heineken-x6-un","cerveza","Porrón Heineken x6 un",15700],["porron-imperial-x6-un","cerveza","Porrón Imperial x6 un",11800],["porron-miller-x6-un","cerveza","Porrón Miller x6 un",13000],["agua-villamanaos-2l-x6","bebidas","Agua Villamanaos 2l. x6",3600],["agua-villamanaos-600ml-x12-un","bebidas","Agua Villamanaos 600ml. x12 un",4450],["bidon-agua-manaos-6-lts","bebidas","Bidon Agua Manaos 6 Lts",1900],["soda-manaos-x6-un","bebidas","Soda Manaos x6 un",7560],["speed-250-ml-pack-x24-un","bebidas","Speed 250 Ml. pack x24 un",29800],["speed-473-ml-pack-x12-un","bebidas","Speed 473 Ml. pack x12 un",24400],["monster-energy-x6-un","bebidas","Monster Energy x6 un",15120],["monster-energy-x-unidad-mango","bebidas","Monster Energy x unidad Mango",2520],["monster-energy-x-unidad-negro","bebidas","Monster Energy x unidad Negro",2520],["manaos-2-25lt-x6-un","bebidas","Manaos 2.25lt x6 un",8500],["manaos-2-25lt-x6-un-zero","bebidas","Manaos 2.25lt x6 un Zero",2999],["placer-1-5lt-x6-un","bebidas","Placer 1.5lt x6 un",5750],["placer-500ml-x12-un","bebidas","Placer 500ml x12 un",6000],["coca-cola-1-75lt-x8-un","bebidas","Coca Cola 1.75lt x8 un",27600],["coca-cola-1lt-x8-un-descartable","bebidas","Coca Cola 1lt x8 un Descartable",17800],["coca-cola-2-25lt-x6-un","bebidas","Coca Cola 2.25lt x6 un",24800],["coca-cola-2-25lt-x8-un","bebidas","Coca Cola 2.25lt x8 un",33000],["coca-cola-2lt-x9-un-retornable","bebidas","Coca Cola 2lt x9 un Retornable",26250],["coca-cola-600ml-x6-un","bebidas","Coca Cola 600ml x6 un",8880],["coca-cola-lata-354-x6-un","bebidas","Coca Cola Lata 354 x6 un",7950],["coca-cola-vidrio-1lt-x12-un","bebidas","Coca Cola Vidrio 1lt. x12 un",28000],["sprite-2-25lt-x6-un","bebidas","Sprite 2.25lt x6 un",24800],["sprite-600ml-x6-un","bebidas","Sprite 600ml x6 un",8880],["sprite-lata-354-x6-un","bebidas","Sprite Lata 354 x6 un",7950],["seven-up-2l-x8-un","bebidas","Seven Up 2l x8 un",24000],["baggio-1lt-multi-pack-x8-un","bebidas","Baggio 1lt. Multi - pack x8 un",14650],["baggio-1lt-nar-pack-x8-un","bebidas","Baggio 1lt. Nar - pack x8 un",14650],["baggio-1lt-x-unidad-multi","bebidas","Baggio 1lt. x unidad Multi",1900],["baggio-1lt-x-unidad-nar","bebidas","Baggio 1lt. x unidad Nar",1900],["baggio-200ml-x18-un","bebidas","Baggio 200ml x18 un",8900],["cepita-1lt-x6-un","bebidas","Cepita 1lt x6 un",11700],["cepita-1lt-durazno-x-unidad","bebidas","Cepita 1lt Durazno x unidad",1950],["cepita-1lt-naranja-x-unidad","bebidas","Cepita 1lt Naranja x unidad",1950],["up-grade-x6-un","bebidas","Up Grade x6 un",5100],["powerade-500ml-x6-un","bebidas","Powerade 500ml x6 un",7200],["pepito-jugo-caja-x18-un","bebidas","Pepito Jugo Caja x18 un",7470],["gatorade-750-x6","bebidas","Gatorade 750 x6",12960],["fernet-1882-450ml","licores","Fernet 1882 450ml",5800],["fernet-1882-750ml","licores","Fernet 1882 750ml",8130],["fernet-1882-lata-x6-un","licores","Fernet 1882 Lata x6 un",10800],["fernet-branca-450ml","licores","Fernet Branca 450ml",11490],["fernet-branca-750ml","licores","Fernet Branca 750ml",16100],["fernet-buhero-negro-450ml","licores","Fernet Buhero Negro 450ml",5370],["fernet-buhero-negro-750ml","licores","Fernet Buhero Negro 750ml",6645],["federico-alvear-x6-un","licores","Federico Alvear x6 un",27000],["federico-alvear-x-unidad","licores","Federico Alvear x unidad",4500],["fernandito-doble-x6-un","licores","Fernandito Doble x6 un",5760],["dr-lemon-1lt-x-unidad","licores","Dr Lemon 1lt x unidad",3140],["dr-lemon-1lt-x12-un","licores","Dr Lemon 1lt x12 un",37680],["dr-lemon-lata-473-x6-un","licores","Dr Lemon Lata 473 x6 un",11350],["criadores-petaca-pack-x12-un","licores","Criadores Petaca pack x12 un",25700],["criadores-petaca-x-unidad","licores","Criadores Petaca x unidad",2150],["cordero-con-piel-de-lobo-malbec","licores","Cordero con Piel de Lobo Malbec",5000],["campari-750ml","licores","Campari 750ml",11720],["frizze-pack-x6","licores","Frizze pack x6",14760],["gancia-lima-lata-x6-un","licores","Gancia + Lima Lata x6 un",14650],["gancia-lata-x6-un-sin-alcohol","licores","Gancia Lata x6 un / sin Alcohol",10920],["gancia-x-950ml-un","licores","Gancia x 950ml Un.",6800],["gentileza-clasico-x6-un","licores","Gentileza Clasico x6 un",8500],["gentileza-patero-x6-un","licores","Gentileza Patero x6 un",10920],["new-style-evo-vodka-saborizado","licores","New Style Evo. Vodka Saborizado",5575],["new-style-gin-1lt","licores","New Style Gin 1lt",3900],["new-style-ron-blanco-1lt","licores","New Style Ron Blanco 1lt",4000],["new-style-vodka-1lt-clasico","licores","New Style Vodka 1lt Clasico",3900],["norton-cosecha-tardia-bco-caja-x6-un","licores","Norton Cosecha Tardia Bco Caja x6 un",24480],["norton-cosecha-tardia-blanco-x-unidad","licores","Norton Cosecha Tardia Blanco x unidad",4080],["pronto-bitt-lata-x6-roja","licores","Pronto Bitt Lata x6 (roja)",11150],["pronto-shake-lata-x6-azul","licores","Pronto Shake Lata x6 (azul)",11150],["santa-filomena-patero-x6-un","licores","Santa Filomena Patero x6 un",15525],["sidra-1888","licores","Sidra 1888",8400],["sky-vodka-saborizado","licores","Sky Vodka Saborizado",9580],["smirnoff-ice-lata-x6-un","licores","Smirnoff Ice Lata x6 un",16250],["smirnoff-vodka-saborizado","licores","Smirnoff Vodka Saborizado",9155],["toro-clasico-x6-un","licores","Toro Clasico x6 un",11900],["uvita-bco-dulce-pack-x12-un","licores","Uvita Bco. Dulce pack x12 un",16200],["uvita-blanco-pack-x12-un","licores","Uvita Blanco pack x12 un",16200],["uvita-tinto-pack-x12-un","licores","Uvita Tinto pack x12 un",16200],["uvita-tto-dulce-pack-x12-un","licores","Uvita Tto. Dulce pack x12 un",16200],["vinas-de-alvear-1-25lt-x6-un","licores","Viñas de Alvear 1.25lt x6 un",14500],["vinas-de-balbo-1-25lt-x6-un","licores","Viñas de Balbo 1.25lt x6 un",14500],["encendedor-candela-x-caja","golosinas","Encendedor Candela x Caja",6350],["encendedor-maxi-bic","golosinas","Encendedor Maxi Bic",1310],["encendedor-mini-bic","golosinas","Encendedor Mini Bic",1030],["gury-azucar-pack-x10","almacen","Gury Azucar pack x10",11040],["imperial-azucar-pack-x10","almacen","Imperial Azucar pack x10",10850],["ledesma-azucar-pack","almacen","Ledesma Azucar pack",14950],["ledesma-azucar-unidad","almacen","Ledesma Azucar unidad",1495],["sol-pampeano-fideo-ave-maria","fideos","Sol Pampeano Fideo Ave Maria",780],["sol-pampeano-fideo-celentano","fideos","Sol Pampeano Fideo Celentano",780],["sol-pampeano-fideo-codito","fideos","Sol Pampeano Fideo Codito",780],["sol-pampeano-fideo-codo","fideos","Sol Pampeano Fideo Codo",780],["sol-pampeano-fideo-cornetin","fideos","Sol Pampeano Fideo Cornetín",780],["sol-pampeano-fideo-dedal","fideos","Sol Pampeano Fideo Dedal",780],["sol-pampeano-fideo-dedalito","fideos","Sol Pampeano Fideo Dedalito",780],["sol-pampeano-fideo-foratti","fideos","Sol Pampeano Fideo Foratti",780],["sol-pampeano-fideo-mostachol-rayado","fideos","Sol Pampeano Fideo Mostachol Rayado",780],["sol-pampeano-fideo-monos","fideos","Sol Pampeano Fideo Moños",1150],["sol-pampeano-fideo-municiones","fideos","Sol Pampeano Fideo Municiones",780],["sol-pampeano-fideo-rigatti","fideos","Sol Pampeano Fideo Rigatti",780],["sol-pampeano-fideo-spaghetti","fideos","Sol Pampeano Fideo Spaghetti",780],["sol-pampeano-fideo-tallarin","fideos","Sol Pampeano Fideo Tallarín",780],["sol-pampeano-fideo-tirabuzon","fideos","Sol Pampeano Fideo Tirabuzón",780],["sol-pampeano-fideo-vegetales-mostachol","fideos","Sol Pampeano Fideo Vegetales Mostachol",1035],["sol-pampeano-fideo-vegetales-tirabuzon","fideos","Sol Pampeano Fideo Vegetales Tirabuzón",1035],["beldent-display","golosinas","Beldent Display",11760],["block-38gr","golosinas","Block 38gr.",1515],["block-110gr","golosinas","Block 110gr.",3790],["bubbaloo","golosinas","Bubbaloo",5720],["capitan-del-espacio-alf-blanco","golosinas","Capitan del Espacio Alf Blanco",1250],["capitan-del-espacio-alf-negro","golosinas","Capitan del Espacio Alf Negro",1250],["capitan-del-espacio-alf-triple-negro","golosinas","Capitan del Espacio Alf Triple Negro",1960],["cereal-fort-unidad","golosinas","Cereal Fort unidad",575],["cereal-mix-unidad","golosinas","Cereal Mix unidad",860],["chup-crazy-pop-x5","golosinas","Chup. Crazy Pop x5",3900],["chup-evolution-24un-azul","golosinas","Chup. Evolution 24un. Azul",5090],["chup-evolution-24un-rojo","golosinas","Chup. Evolution 24un. Rojo",5090],["chup-mr-pop-frutal-50un","golosinas","Chup. Mr Pop Frutal 50un.",6470],["chup-pelotitas-x50","golosinas","Chup. Pelotitas x50",2915],["chup-pico-dulcex48unid","golosinas","Chup. Pico Dulcex48unid",11700],["escolar-alfajor","golosinas","Escolar Alfajor",12050],["girasol-suschen-bolsa-x20-un","golosinas","Girasol Suschen Bolsa x20 un",3090],["guaymallen-alf-x-caja","golosinas","Guaymallen Alf x Caja",12200],["guaymallen-alf-triple-x-caja","golosinas","Guaymallen Alf Triple x Caja",12240],["hamlet-unidad","golosinas","Hamlet unidad",805],["jorgito-alf-caja","golosinas","Jorgito Alf. Caja",22080],["kinder-unidad","golosinas","Kinder unidad",2860],["lheritier-car-masticables","golosinas","Lheritier Car. Masticables",2155],["lipo-car-super-acido","golosinas","Lipo Car. Super Acido",2750],["mentitas-x12menta","golosinas","Mentitas X12menta",4560],["minitorta-aguila-alf","golosinas","Minitorta Aguila Alf",1460],["misky-choc-25-gr-unidad","golosinas","Misky Choc. 25 Gr. unidad",830],["misky-choc-50gr-unidad","golosinas","Misky Choc. 50gr. unidad",1460],["misky-gomita-rollo-x12","golosinas","Misky Gomita Rollo x12",4560],["misky-gomitas-eucaliptus","golosinas","Misky Gomitas Eucaliptus",9620],["misky-gomitas-fantasia","golosinas","Misky Gomitas Fantasia",9620],["mogul-gomas-dientitos-500gr","golosinas","Mogul Gomas Dientitos 500gr",7590],["mogul-gomas-moritas-500gr","golosinas","Mogul Gomas Moritas 500gr",7590],["mogul-gomas-tiburoncitos","golosinas","Mogul Gomas Tiburoncitos",7030],["mogul-gomita-rollo-acido-extreme","golosinas","Mogul Gomita Rollo Acido Extreme",6410],["mogul-gomita-rollo-x12","golosinas","Mogul Gomita Rollo x12",6410],["oblea-bon-o-bon","golosinas","Oblea Bon O Bon",1080],["oreo-alf","golosinas","Oreo Alf",1250],["palito-de-la-selva-car-660gr","golosinas","Palito de la Selva Car. 660gr",10000],["paraguitas","golosinas","Paraguitas",730],["pepitos-alf","golosinas","Pepitos Alf",1385],["pipa-gigante-en-caja","golosinas","Pipa Gigante en Caja",8270],["pipa-gigante-en-tira-x10","golosinas","Pipa Gigante en Tira x10",7100],["rasta-alf-unidad","golosinas","Rasta Alf unidad",1070],["rocklets-caja-24x20gr","golosinas","Rocklets Caja (24x20gr)",18720],["rocklets-caja-18x40gr","golosinas","Rocklets Caja (18x40gr)",25560],["rhodesia","golosinas","Rhodesia",820],["sapito-24un","golosinas","Sapito 24un.",7250],["sugus-caramelos-surtidos-mast","golosinas","Sugus Caramelos Surtidos Mast",8230],["tita","golosinas","Tita",740],["tnt-chicle-surt-40-unidades","golosinas","Tnt Chicle Surt 40 Unidades",3960],["tnt-car-60uni-violetapintalengua","golosinas","Tnt Car 60uni Violetapintalengua",4315],["tnt-car-60unidades-naranja-surtido","golosinas","Tnt Car 60unidades Naranja Surtido",4315],["topline-7-x16-un-unidad","golosinas","Topline-7 x16 un unidad",13550],["turron-arcor-caja","golosinas","Turrón Arcor Caja",13000],["turron-misky-caja","golosinas","Turrón Misky Caja",11250],["vimar-alf-simple-x-caja","golosinas","Vimar Alf. Simple x Caja",12000],["vimar-alf-triple-x-caja","golosinas","Vimar Alf. Triple x Caja",10920],["ala-arroz-1kg-no-se-pasa","arroz","Ala Arroz 1kg No Se Pasa",1630],["ala-arroz-1kg-doble-carolina","arroz","Ala Arroz 1kg. Doble Carolina",2500],["ala-arroz-1kg-largo-fino","arroz","Ala Arroz 1kg. Largo Fino",1395],["ala-arroz-500gr-no-se-pasa","arroz","Ala Arroz 500gr No Se Pasa",875],["ala-arroz-500gr-doble-carolina","arroz","Ala Arroz 500gr. Doble Carolina",1130],["ala-arroz-500gr-largo-fino","arroz","Ala Arroz 500gr. Largo Fino",775],["dos-hermanos-arroz-1kg-doble-carolina","arroz","Dos Hermanos Arroz 1kg Doble Carolina",2150],["dos-hermanos-arroz-1kg-integral","arroz","Dos Hermanos Arroz 1kg Integral",1460],["dos-hermanos-arroz-1kg-parboil","arroz","Dos Hermanos Arroz 1kg Parboil",1550],["dos-hermanos-arroz-1kg-rojo-largo-fino","arroz","Dos Hermanos Arroz 1kg. Rojo Largo Fino",1400],["dos-hermanos-arroz-500gr-doble-carolina","arroz","Dos Hermanos Arroz 500gr Doble Carolina",1280],["dos-hermanos-arroz-500gr-parboil","arroz","Dos Hermanos Arroz 500gr Parboil",890],["dos-hermanos-arroz-500gr-rojo-largo-fino","arroz","Dos Hermanos Arroz 500gr Rojo Largo Fino",775],["klick-arroz-1kg","arroz","Klick Arroz 1kg",1065],["lucchetti-arroz-largo-fino-1k","arroz","Lucchetti Arroz Largo Fino 1k",1675],["lucchetti-arroz-no-se-pasa-1k","arroz","Lucchetti Arroz No Se Pasa 1k",2090],["lucchetti-arroz-amarillo-500gr","arroz","Lucchetti Arroz Amarillo 500gr",1100],["lucchetti-arroz-largo-fino-500gr","arroz","Lucchetti Arroz Largo Fino 500gr",995],["marolio-arroz-1-k","arroz","Marolio Arroz 1 K",1390],["marolio-arroz-500gr","arroz","Marolio Arroz 500gr.",750],["don-vicente-fideos-caserito","fideos","Don Vicente Fideos Caserito",3030],["don-vicente-fideos-fettuccini","fideos","Don Vicente Fideos Fettuccini",3030],["don-vicente-fideos-rigatti","fideos","Don Vicente Fideos Rigatti",3030],["don-vicente-fideos-tallarin","fideos","Don Vicente Fideos Tallarín",3030],["don-vicente-fideos-tirabuzon","fideos","Don Vicente Fideos Tirabuzón",3030],["dona-irma-espinaca-nido","fideos","Doña Irma Espinaca Nido",1500],["dona-irma-fideo-cinta","fideos","Doña Irma Fideo Cinta",1500],["dona-irma-fideos-monos","fideos","Doña Irma Fideos Moños",1500],["dona-irma-fideos-monos-2","fideos","Doña Irma Fideos Moños",1350],["dona-irma-morron-nido","fideos","Doña Irma Morron Nido",1350],["dona-irma-monitos","fideos","Doña Irma Moñitos",1500],["dona-irma-nido-n3","fideos","Doña Irma Nido N3",1500],["lucchetti-fideos-monos","fideos","Lucchetti Fideos Moños",2130],["lucchetti-fideos-ave-maria","fideos","Lucchetti Fideos Ave Maria",1190],["lucchetti-fideos-codito","fideos","Lucchetti Fideos Codito",1190],["lucchetti-fideos-dedalitos","fideos","Lucchetti Fideos Dedalitos",1190],["lucchetti-fideos-foratini","fideos","Lucchetti Fideos Foratini",1190],["lucchetti-fideos-mostachol-n51","fideos","Lucchetti Fideos Mostachol N51",1190],["lucchetti-fideos-municiones","fideos","Lucchetti Fideos Municiones",1190],["lucchetti-fideos-spaghetti-n5","fideos","Lucchetti Fideos Spaghetti N5",1190],["lucchetti-fideos-spaghetti-n7","fideos","Lucchetti Fideos Spaghetti N°7",1190],["lucchetti-fideos-tallarin","fideos","Lucchetti Fideos Tallarín",1190],["lucchetti-fideos-tirabuzon","fideos","Lucchetti Fideos Tirabuzón",1190],["lucchetti-letritas-sopa","fideos","Lucchetti Letritas Sopa",1190],["lucchetti-penne-rigate-n45","fideos","Lucchetti Penne Rigate N°45",1190],["matarazzo-fideos-mostachol","fideos","Matarazzo Fideos Mostachol",1850],["matarazzo-fideos-mono","fideos","Matarazzo Fideos Moño",2420],["matarazzo-fideos-penne-rigate","fideos","Matarazzo Fideos Penne Rigate",1850],["matarazzo-fideos-spaghetti","fideos","Matarazzo Fideos Spaghetti",1850],["matarazzo-fideos-tallarin","fideos","Matarazzo Fideos Tallarín",1850],["matarazzo-fideos-tirabuzon","fideos","Matarazzo Fideos Tirabuzón",1850],["amanda-yerba-1kg","yerba","Amanda Yerba 1kg",3750],["amanda-yerba-500gr","yerba","Amanda Yerba 500gr.",1875],["baldo-yerba-1kg","yerba","Baldo Yerba 1kg",11775],["baldo-yerba-500gr","yerba","Baldo Yerba 500gr",6555],["cachamate-yerba-1kg-amarilla","yerba","Cachamate Yerba 1kg Amarilla",3215],["cachamate-yerba-1kg-h-serranas","yerba","Cachamate Yerba 1kg H. Serranas",3215],["cachamate-yerba-1kg-rosa","yerba","Cachamate Yerba 1kg Rosa",3215],["cachamate-yerba-500gr-amarilla","yerba","Cachamate Yerba 500gr Amarilla",1700],["cachamate-yerba-500gr-blanca","yerba","Cachamate Yerba 500gr Blanca",1700],["cachamate-yerba-500gr-rosa","yerba","Cachamate Yerba 500gr Rosa",1700],["canarias-yerba-1kg","yerba","Canarias Yerba 1kg",12470],["canarias-yerba-500gr","yerba","Canarias Yerba 500gr",6565],["cbse-yerba-1kg-h-serranas","yerba","Cbse Yerba 1kg H. Serranas",3750],["cbse-yerba-500gr-h-serranas","yerba","Cbse Yerba 500gr H. Serranas",1875],["cruz-malta-yerba-1-kg","yerba","Cruz Malta Yerba 1 Kg",3535],["cruz-malta-yerba-500gr","yerba","Cruz Malta Yerba 500gr",1875],["la-cumbrecita-yerba-1kg","yerba","La Cumbrecita Yerba 1kg",3375],["la-cumbrecita-yerba-500gr","yerba","La Cumbrecita Yerba 500gr",1615],["mananita-yerba-1kg","yerba","Mañanita Yerba 1kg.",4375],["mananita-yerba-500gr","yerba","Mañanita Yerba 500gr.",2125],["nobleza-gaucha-yerba-1kg","yerba","Nobleza Gaucha Yerba 1kg",3395],["nobleza-gaucha-yerba-500gr","yerba","Nobleza Gaucha Yerba 500gr",1785],["playadito-yerba-1k","yerba","Playadito Yerba 1k",4375],["playadito-yerba-500gr","yerba","Playadito Yerba 500gr.",2370],["taragui-yerba-1kg","yerba","Taragui Yerba 1kg.",4085],["taragui-yerba-500gr","yerba","Taragui Yerba 500gr",2065],["union-yerba-1k","yerba","Union Yerba 1k",3810],["union-yerba-500gr","yerba","Union Yerba 500gr",2125],["canuelas-aceite-1-5lt","aceites","Cañuelas Aceite 1.5lt",6165],["canuelas-aceite-900","aceites","Cañuelas Aceite 900",3740],["cocinero-aceite-900","aceites","Cocinero Aceite 900",3750],["cocinero-aceite-900ml-mezcla","aceites","Cocinero Aceite 900ml Mezcla",3375],["cocinero-aceite-girasol-1-5-lt","aceites","Cocinero Aceite Girasol 1.5 Lt",6250],["natura-aceite-3lt","aceites","Natura Aceite 3lt",13625],["natura-aceite-1-5-lt","aceites","Natura Aceite 1.5 Lt",6450],["natura-aceite-900cc","aceites","Natura Aceite 900cc",4440],["san-vicente-aceite-girasol-4l","aceites","San Vicente Aceite Girasol 4l",10350],["san-vicente-aceite-girasol-900","aceites","San Vicente Aceite Girasol 900",2300],["san-vicente-aceite-1-5lt","aceites","San Vicente Aceite 1.5lt",4080],["san-vicente-vinagre-5l","aceites","San Vicente Vinagre 5l",2690],["sol-aceite-mezcla-800ml","aceites","Sol Aceite Mezcla 800ml",2140],["bolsas-camiseta-30x40-20u-amarilla","almacen","Bolsas Camiseta 30x40 20u. Amarilla",1795],["bolsas-camiseta-40x50blanca-funda-amarilla-x20","almacen","Bolsas Camiseta 40x50blanca Funda Amarilla x20",2930],["bolsas-camiseta-ecologica-verde","almacen","Bolsas Camiseta Ecologica Verde",1530],["arcor-pure-de-tomate-1050gr","tomate","Arcor Puré de Tomate 1050gr.",1740],["arcor-salsa-340gr-dp-filetto","tomate","Arcor Salsa 340gr Dp Filetto",1195],["arcor-salsa-340gr-dp-pizza","tomate","Arcor Salsa 340gr Dp Pizza",1195],["arcor-tomate-lata","tomate","Arcor Tomate Lata",1365],["campagnola-pure-de-tomate-unidad","tomate","Campagnola Puré de Tomate unidad",1160],["huerta-pure-de-tomate-x12","tomate","Huerta Puré de Tomate x12",10250],["huerta-pure-de-tomate-x-unidad","tomate","Huerta Puré de Tomate x unidad",875],["inca-pure-de-tomate-520g","tomate","Inca Puré de Tomate 520g",950],["inca-tomate-botella","tomate","Inca Tomate Botella",3095],["la-campagnola-pure-de-tomate","tomate","La Campagnola Puré de Tomate",1040],["marolio-pure-de-tomate-unidad","tomate","Marolio Puré de Tomate unidad",750],["marolio-pure-de-tomate-x24","tomate","Marolio Puré de Tomate x24",18000],["molto-pure-de-tomate-unidad","tomate","Molto Puré de Tomate (unidad)",975],["molto-pure-tomate-x24-un","tomate","Molto Puré Tomate x24 un",23400],["salsati-pure-de-tomate-unidad","tomate","Salsati Puré de Tomate (unidad)",1210],["dulcor-tomate-botella-960gr","tomate","Dulcor Tomate Botella 960gr",2015],["marolio-tomate-botella","tomate","Marolio Tomate Botella",2810],["marolio-tomate-perita-lata","tomate","Marolio Tomate Perita Lata",1240],["molto-tomate-botella","tomate","Molto Tomate Botella",3250],["molto-tomate-en-lata","tomate","Molto Tomate en Lata",1270],["molto-vinagre-1lt-alcohol","aceites","Molto Vinagre 1lt Alcohol",1270],["molto-vinagre-1lt-manzana","aceites","Molto Vinagre 1lt Manzana",2740],["molto-vinagre-500ml-alcohol","aceites","Molto Vinagre 500ml Alcohol",1015],["molto-vinagre-500ml-manzana","aceites","Molto Vinagre 500ml Manzana",1650],["tang-x20","bebidas","Tang x20",7125],["rinde-2","bebidas","Rinde 2",5320],["clight-x20","bebidas","Clight x20",7125],["danica-100ml-mayonesa-x20-un","almacen","Danica 100ml Mayonesa x20 un",10200],["hellmans-118gr-mayonesa-x20-un","almacen","Hellmans 118gr Mayonesa x20 un",14000],["natura-125gr-mayonesa-caja-x20-un","almacen","Natura 125gr Mayonesa Caja x20 un",12300]]}</script>
+<script id="app">
+(function(){
+  // WhatsApp de La Unión (código de país, sin signos) y link corto del catálogo.
+  var CONFIG = { whatsapp: "5491157632932", negocio: "La Unión Mayorista", link: "https://tinyurl.com/2dprvdn7" };
+  var CATS = [
+    {id:"cerveza", nombre:"Cervezas"},
+    {id:"bebidas", nombre:"Gaseosas, aguas y jugos"},
+    {id:"licores", nombre:"Fernet, vinos y licores"},
+    {id:"golosinas", nombre:"Golosinas y kiosco"},
+    {id:"arroz", nombre:"Arroz"},
+    {id:"fideos", nombre:"Fideos"},
+    {id:"yerba", nombre:"Yerba"},
+    {id:"aceites", nombre:"Aceites y vinagres"},
+    {id:"tomate", nombre:"Puré y salsas de tomate"},
+    {id:"almacen", nombre:"Azúcar y almacén"}
+  ];
+
+  // Piezas fijas del documento. Sirven para que el administrador publique una versión nueva desde la página.
+  var SK_HEAD = '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>\n';
+  var SK_TAIL = '\n</body></html>';
+  var HEAD_HTML = '<title>La Unión Mayorista</title>\n'
+    + '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+    + '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+    + '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap">\n';
+  var S = "scr" + "ipt";
+
+  function el(id){return document.getElementById(id);}
+  el("root").innerHTML = el("markup").textContent;
+
+  function buildDoc(data){
+    var json = JSON.stringify(data).replace(/</g, String.fromCharCode(92) + "u003c");
+    return SK_HEAD + HEAD_HTML
+      + '<style id="css">' + el("css").textContent + '</style>\n'
+      + '<' + S + ' type="text/html" id="markup">' + el("markup").textContent + '</' + S + '>\n'
+      + '<div id="root"></div>\n'
+      + '<' + S + ' id="data" type="application/json">' + json + '</' + S + '>\n'
+      + '<' + S + ' id="app">' + el("app").textContent + '</' + S + '>\n'
+      + SK_TAIL;
+  }
+  if(window.__LU_TEST){window.__LU_TEST.buildDoc = buildDoc;}
+
+  var DATA = JSON.parse(el("data").textContent);
+  var P = [], PBY = {}, CBY = {};
+  CATS.forEach(function(c){CBY[c.id]=c;});
+  function loadProducts(){
+    P = DATA.p.map(function(r){return {id:r[0],cat:r[1],nombre:r[2],precio:r[3],agotado:r[4]===1};});
+    PBY = {};
+    P.forEach(function(p){PBY[p.id]=p; p.hay = norm(p.nombre+" "+CBY[p.cat].nombre);});
+  }
+
+  var DIAC = new RegExp("[" + String.fromCharCode(768) + "-" + String.fromCharCode(879) + "]", "g");
+  function norm(s){return String(s).normalize("NFD").replace(DIAC,"").toLowerCase();}
+  function money(n){return "$" + String.fromCharCode(160) + Math.round(n).toLocaleString("es-AR");}
+  function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+  function pad(n){return (n<10?"0":"")+n;}
+  function todayISO(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+  function fechaTxt(iso){var a=String(iso).split("-");return a.length===3?a[2]+"/"+a[1]+"/"+a[0]:iso;}
+  function slug(s){return norm(s).replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");}
+
+  loadProducts();
+
+  var cart = {}, notas = "", perfil = null;
+  var state = {cat:"todo", q:""};
+  var KEY = "launion-pedido-v3", PKEY = "launion-cliente-v1";
+  var lastFocus = null, isOwner = false, adminMode = false, orig = {};
+
+  function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
+  function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function saveCart(){lsSet(KEY,{cart:cart,notas:el("notas").value});}
+
+  function calc(){
+    var cant=0,total=0,lines=[];
+    P.forEach(function(p){
+      var q=cart[p.id];
+      if(!q||p.agotado)return;
+      cant+=q;total+=q*p.precio;
+      lines.push({p:p,q:q});
+    });
+    return {cant:cant,total:total,lines:lines};
+  }
+
+  function stepHTML(p,q){
+    return '<div class="step"><button type="button" data-act="dec" aria-label="Quitar uno de '+esc(p.nombre)+'">−</button>'
+      +'<input data-act="inp" type="number" inputmode="numeric" min="0" max="999" value="'+q+'" aria-label="Cantidad de '+esc(p.nombre)+'">'
+      +'<button type="button" data-act="inc" aria-label="Agregar uno de '+esc(p.nombre)+'">+</button></div>';
+  }
+
+  function rowHTML(p){
+    var head='<div><h3>'+esc(p.nombre)+'</h3>';
+    if(adminMode){
+      return '<article class="row adm'+(rowChanged(p)?' chg':'')+'" data-id="'+p.id+'">'+head
+        +'<label class="chk"><input type="checkbox" data-act="soldout"'+(p.agotado?' checked':'')+'> Agotado</label></div>'
+        +'<label class="pin"><span>$</span><input type="number" inputmode="numeric" min="0" step="1" data-act="price" value="'+p.precio+'" aria-label="Precio de '+esc(p.nombre)+'"></label></article>';
+    }
+    if(p.agotado){
+      return '<article class="row out" data-id="'+p.id+'">'+head+'<p class="price">'+money(p.precio)+'</p></div><span class="pill">Agotado</span></article>';
+    }
+    var q=cart[p.id]||0;
+    var buy=q>0?stepHTML(p,q):'<button type="button" class="add" data-act="inc" aria-label="Agregar '+esc(p.nombre)+'">Agregar</button>';
+    return '<article class="row" data-id="'+p.id+'">'+head+'<p class="price">'+money(p.precio)+'</p></div>'+buy+'</article>';
+  }
+
+  function renderChips(){
+    var items=[{id:"todo",nombre:"Todo"}].concat(CATS);
+    el("cats").innerHTML=items.map(function(c){
+      return '<button type="button" class="chip" data-cat="'+c.id+'" aria-pressed="'+(state.cat===c.id)+'">'+c.nombre+'</button>';
+    }).join("");
+  }
+
+  function renderList(){
+    var terms=norm(state.q.trim()).split(/\s+/).filter(Boolean);
+    var items=P.filter(function(p){
+      if(state.cat!=="todo"&&p.cat!==state.cat)return false;
+      return terms.every(function(t){return p.hay.indexOf(t)>-1;});
+    });
+    if(!items.length){
+      el("list").innerHTML='<div class="empty">No encontramos productos con esa búsqueda. Probá con otra palabra o pedinos el producto por WhatsApp.</div>';
+      return;
+    }
+    el("list").innerHTML=CATS.map(function(c){
+      var its=items.filter(function(p){return p.cat===c.id;});
+      if(!its.length)return "";
+      return '<section class="cat"><h2><span>'+c.nombre+'</span><small>'+its.length+(its.length===1?" producto":" productos")+'</small></h2><div class="grid">'+its.map(rowHTML).join("")+'</div></section>';
+    }).join("");
+  }
+
+  function refreshRow(id,focusAct){
+    var old=document.querySelector('.row[data-id="'+id+'"]');
+    if(!old)return;
+    var t=document.createElement("template");
+    t.innerHTML=rowHTML(PBY[id]).trim();
+    var n=t.content.firstElementChild;
+    old.replaceWith(n);
+    if(focusAct){var b=n.querySelector('[data-act="'+focusAct+'"]');if(b)b.focus({preventScroll:true});}
+  }
+
+  function setQty(id,v,focusAct,fromSheet){
+    v=parseInt(v,10);
+    if(isNaN(v)||v<0)v=0;
+    if(v>999)v=999;
+    if(v>0)cart[id]=v;else delete cart[id];
+    refreshRow(id,fromSheet?null:focusAct);
+    renderBar();
+    if(!el("sheet").hidden)renderCart(fromSheet?{id:id,act:focusAct}:null);
+    saveCart();
+  }
+
+  function renderBar(){
+    var c=calc();
+    el("cartbar").hidden=c.cant===0||adminMode;
+    el("cartlabel").textContent="Ver pedido · "+c.cant+(c.cant===1?" artículo":" artículos");
+    el("carttotal").textContent=money(c.total);
+  }
+
+  function datosTxt(){
+    var p=perfil||{};
+    return ["Comercio: "+(p.comercio||"—"),"Dueño/s: "+(p.duenos||"—"),"Teléfono: "+(p.tel||"—"),"Dirección: "+(p.dir||"—")+(p.loc?", "+p.loc:"")];
+  }
+  function orderText(c){
+    var nt=el("notas").value.trim();
+    var L=["*Pedido – "+CONFIG.negocio+"*"].concat(datosTxt());
+    L.push("");
+    c.lines.forEach(function(l){L.push(l.q+" x "+l.p.nombre+" – "+money(l.p.precio)+" c/u = "+money(l.q*l.p.precio));});
+    L.push("");
+    L.push("Artículos: "+c.cant);
+    L.push("*Total: "+money(c.total)+"*");
+    if(nt){L.push("");L.push("Notas: "+nt);}
+    return L.join("\n");
+  }
+  function waLink(txt){return "https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent(txt);}
+
+  function renderOrder(c){
+    c=c||calc();
+    var txt=orderText(c);
+    el("preview").value=txt;
+    el("wa").href=waLink(txt);
+    el("who").textContent=perfil?("Pedido para "+perfil.comercio+" · "+perfil.dir+(perfil.loc?", "+perfil.loc:"")):"";
+  }
+
+  function renderCart(focus){
+    var c=calc();
+    if(!c.lines.length){closeCart();return;}
+    el("lines").innerHTML=c.lines.map(function(l){
+      return '<div class="line" data-id="'+l.p.id+'"><div class="lname"><b>'+esc(l.p.nombre)+'</b><span>'+money(l.p.precio)+' c/u</span></div>'
+        +'<div class="ltotal">'+money(l.q*l.p.precio)+'</div>'+stepHTML(l.p,l.q)+'</div>';
+    }).join("");
+    el("totals").innerHTML='<div><dt>Artículos</dt><dd>'+c.cant+'</dd></div><div class="grand"><dt>Total</dt><dd>'+money(c.total)+'</dd></div>';
+    renderOrder(c);
+    if(focus&&focus.act){
+      var b=document.querySelector('.line[data-id="'+focus.id+'"] [data-act="'+focus.act+'"]');
+      if(b)b.focus({preventScroll:true});
+    }
+  }
+
+  function openCart(){
+    lastFocus=document.activeElement;
+    el("sheet").hidden=false;
+    document.body.style.overflow="hidden";
+    el("status").textContent="";
+    renderCart();
+    el("closecart").focus();
+  }
+  function closeCart(){
+    el("sheet").hidden=true;
+    document.body.style.overflow="";
+    if(lastFocus&&lastFocus.focus){try{lastFocus.focus({preventScroll:true});}catch(e){}}
+  }
+
+  function handleStep(e,host){
+    var b=e.target.closest("button[data-act]");
+    if(!b)return;
+    var h=b.closest(host);
+    if(!h)return;
+    var id=h.getAttribute("data-id"),q=cart[id]||0,act=b.getAttribute("data-act");
+    var fromSheet=host===".line";
+    if(act==="inc")setQty(id,q+1,"inc",fromSheet);
+    else if(act==="dec")setQty(id,q-1,"dec",fromSheet);
+  }
+  function handleInput(e,host){
+    var i=e.target.closest("input[data-act='inp']");
+    if(!i)return;
+    setQty(i.closest(host).getAttribute("data-id"),i.value,null,host===".line");
+  }
+
+  // ---- Registro del comercio ----
+  function renderMe(){
+    el("editme").hidden=!(perfil||isOwner);
+    el("editme").textContent=perfil?"Mis datos":"Cargar mis datos";
+  }
+  function openReg(editing){
+    var p=perfil||{};
+    el("r-duenos").value=p.duenos||"";
+    el("r-comercio").value=p.comercio||"";
+    el("r-tel").value=p.tel||"";
+    el("r-dir").value=p.dir||"";
+    el("r-loc").value=p.loc||"";
+    el("regcancel").hidden=!(editing&&perfil)&&!isOwner;
+    el("regsubmit").textContent=editing?"Guardar datos":"Entrar al catálogo";
+    el("r-err").hidden=true;
+    el("reg").hidden=false;
+    document.body.style.overflow="hidden";
+  }
+  function closeReg(){el("reg").hidden=true;document.body.style.overflow="";}
+  function showWelcome(){
+    el("w-name").textContent=perfil.comercio;
+    var L=["*Nuevo cliente – "+CONFIG.negocio+"*"].concat(datosTxt());
+    el("w-wa").href=waLink(L.join("\n"));
+    el("welcome").hidden=false;
+  }
+  el("regform").addEventListener("submit",function(e){
+    e.preventDefault();
+    var v={duenos:el("r-duenos").value.trim(),comercio:el("r-comercio").value.trim(),tel:el("r-tel").value.trim(),dir:el("r-dir").value.trim(),loc:el("r-loc").value.trim()};
+    var falta=[];
+    if(!v.duenos)falta.push("nombre del dueño");
+    if(!v.comercio)falta.push("nombre del comercio");
+    if(!v.tel)falta.push("teléfono");
+    if(!v.dir)falta.push("dirección");
+    if(!v.loc)falta.push("localidad");
+    var err=el("r-err");
+    if(falta.length){err.textContent="Falta completar: "+falta.join(", ")+".";err.hidden=false;return;}
+    if(v.tel.replace(/\D/g,"").length<8){err.textContent="El teléfono parece incompleto. Escribilo con la característica, por ejemplo 11 5555 1234.";err.hidden=false;return;}
+    var nuevo=!perfil;
+    perfil=v;lsSet(PKEY,perfil);
+    closeReg();renderMe();renderOrder();
+    if(nuevo)showWelcome();
+  });
+  el("regcancel").addEventListener("click",closeReg);
+  el("editme").addEventListener("click",function(){openReg(true);});
+  el("w-close").addEventListener("click",function(){el("welcome").hidden=true;});
+
+  // ---- Administrador ----
+  function ckey(p){return p.precio+"|"+(p.agotado?1:0);}
+  function snap(){orig={};P.forEach(function(p){orig[p.id]=ckey(p);});}
+  function rowChanged(p){return !!p.nuevo||orig[p.id]!==ckey(p);}
+  function nChanges(){return P.filter(rowChanged).length;}
+  function admMsg(t){el("admmsg").textContent=t;}
+  function updateAdm(){
+    var n=nChanges();
+    el("admpub").textContent=n?"Publicar cambios ("+n+")":"Publicar cambios";
+    el("admpub").disabled=!n;
+    el("admdisc").disabled=!n;
+    if(n)admMsg(n+(n===1?" cambio sin publicar":" cambios sin publicar")+". Los clientes lo ven cuando publicás.");
+    else admMsg("Cambiá precios, marcá agotados o agregá productos.");
+  }
+  function setAdmin(on){
+    adminMode=on;
+    document.body.classList.toggle("adm",on);
+    el("admbar").hidden=!on;
+    el("addcard").hidden=!on;
+    el("adminbtn").textContent=on?"Salir de administrar":"Administrar";
+    if(on){snap();updateAdm();}
+    renderBar();renderList();
+  }
+  function discard(){
+    loadProducts();snap();renderList();updateAdm();
+  }
+  el("adminbtn").addEventListener("click",function(){setAdmin(!adminMode);});
+  el("admdisc").addEventListener("click",discard);
+  el("list").addEventListener("input",function(e){
+    var i=e.target.closest("input[data-act='price']");
+    if(!i)return;
+    var row=i.closest(".row"),p=PBY[row.getAttribute("data-id")];
+    var v=Math.round(parseFloat(i.value));
+    p.precio=(isNaN(v)||v<0)?0:v;
+    row.classList.toggle("chg",rowChanged(p));
+    updateAdm();
+  });
+  el("list").addEventListener("change",function(e){
+    var i=e.target.closest("input[data-act='soldout']");
+    if(!i)return;
+    var row=i.closest(".row"),p=PBY[row.getAttribute("data-id")];
+    p.agotado=i.checked;
+    row.classList.toggle("chg",rowChanged(p));
+    updateAdm();
+  });
+  el("a-cat").innerHTML=CATS.map(function(c){return '<option value="'+c.id+'">'+c.nombre+'</option>';}).join("");
+  el("a-add").addEventListener("click",function(){
+    var nombre=el("a-nombre").value.trim().replace(/\s+/g," "),precio=Math.round(parseFloat(el("a-precio").value));
+    var err=el("a-err");
+    if(!nombre||isNaN(precio)||precio<=0){err.textContent="Escribí el nombre y un precio mayor a cero.";err.hidden=false;return;}
+    err.hidden=true;
+    var id=slug(nombre)||"producto",base=id,n=2;
+    while(PBY[id]){id=base+"-"+n;n++;}
+    var p={id:id,cat:el("a-cat").value,nombre:nombre,precio:precio,agotado:false,nuevo:true};
+    p.hay=norm(p.nombre+" "+CBY[p.cat].nombre);
+    P.push(p);PBY[id]=p;
+    el("a-nombre").value="";el("a-precio").value="";
+    state.cat="todo";state.q="";el("buscar").value="";
+    renderChips();renderList();updateAdm();
+    admMsg("Agregaste «"+nombre+"». Falta publicar.");
+  });
+  function copyText(txt,ok,setMsg){
+    function fb(){setMsg("No se pudo copiar solo. Copialo a mano: "+txt);}
+    try{navigator.clipboard.writeText(txt).then(function(){setMsg(ok);},fb);}catch(err){fb();}
+  }
+  el("admlink").addEventListener("click",function(){copyText(CONFIG.link,"Link copiado: "+CONFIG.link,admMsg);});
+  el("admpub").addEventListener("click",async function(){
+    var art=null;
+    try{art=window.claude&&window.claude.use?await window.claude.use("artifact"):null;}catch(e){art=null;}
+    if(!art){admMsg("No se puede publicar desde esta vista. Abrí el catálogo desde tu cuenta de Claude.");return;}
+    var data={fecha:todayISO(),p:P.map(function(p){var r=[p.id,p.cat,p.nombre,p.precio];if(p.agotado)r.push(1);return r;})};
+    el("admpub").disabled=true;
+    admMsg("Publicando…");
+    try{
+      await art.publish(buildDoc(data));
+      admMsg("Publicado. La página se recarga con los cambios.");
+    }catch(e){
+      var c=e&&e.code;
+      el("admpub").disabled=false;
+      if(c==="conflict")admMsg("Se publicó otra versión mientras editabas. La página se recarga: repetí tu cambio.");
+      else if(c==="not_writer"||c==="not_granted"||c==="not_declared")admMsg("Esta cuenta no puede modificar la página.");
+      else if(c==="rate_limited")admMsg("Estás publicando muy seguido. Esperá unos segundos y probá de nuevo.");
+      else admMsg("No se pudo publicar. Probá de nuevo en un momento.");
+    }
+  });
+
+  // ---- Eventos generales ----
+  el("list").addEventListener("click",function(e){handleStep(e,".row");});
+  el("list").addEventListener("change",function(e){handleInput(e,".row");});
+  el("lines").addEventListener("click",function(e){handleStep(e,".line");});
+  el("lines").addEventListener("change",function(e){handleInput(e,".line");});
+  el("cats").addEventListener("click",function(e){
+    var b=e.target.closest("button[data-cat]");
+    if(!b)return;
+    state.cat=b.getAttribute("data-cat");
+    renderChips();renderList();
+  });
+  el("buscar").addEventListener("input",function(e){state.q=e.target.value;renderList();});
+  el("opencart").addEventListener("click",openCart);
+  el("sheet").addEventListener("click",function(e){if(e.target.closest("[data-close]"))closeCart();});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!el("sheet").hidden)closeCart();});
+  el("notas").addEventListener("input",function(){renderOrder();saveCart();});
+  el("wa").addEventListener("click",function(e){
+    if(!perfil){e.preventDefault();closeCart();openReg(false);}
+  });
+  el("copy").addEventListener("click",function(){
+    copyText(el("preview").value,"Pedido copiado.",function(t){el("status").textContent=t;});
+  });
+
+  // ---- Arranque ----
+  el("fechatxt").textContent="Lista de precios del "+fechaTxt(DATA.fecha)+". Armá tu pedido y mandalo por WhatsApp.";
+  var saved=lsGet(KEY);
+  if(saved){
+    if(saved.cart){for(var id in saved.cart){if(PBY[id]&&!PBY[id].agotado&&saved.cart[id]>0)cart[id]=Math.min(999,saved.cart[id]|0);}}
+    if(saved.notas)el("notas").value=saved.notas;
+  }
+  var pf=lsGet(PKEY);
+  if(pf&&pf.comercio&&pf.tel)perfil=pf;
+  renderChips();renderList();renderBar();renderMe();renderOrder();
+  if(!perfil)openReg(false);
+
+  (async function(){
+    try{
+      var u=window.claude&&window.claude.use?await window.claude.use("user"):null;
+      if(u&&await u.isOwner()){
+        isOwner=true;
+        el("adminbtn").hidden=false;
+        if(!perfil&&!el("reg").hidden)closeReg();
+        renderMe();
+      }
+    }catch(e){}
+  })();
+})();
+</script>
+</body></html>
